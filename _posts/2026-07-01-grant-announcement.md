@@ -4,7 +4,7 @@ title: "Announcing Our New EvalEval Grant Support!"
 date: 2026-07-01
 published: true
 category: Organization
-image: "/assets/img/blogs/evaleval-maskot-smiling_reordering-books.webp"
+image: "/assets/img/blogs/grant-announcement-banner.webp"
 authors:
   - name: "Michelle Lin, WG co-chair on behalf of the EvalEval Coalition"
 tags:
@@ -15,12 +15,6 @@ description: "The EvalEval Coalition has received new grant support from Founder
 ---
 
 The EvalEval Coalition is excited to announce recent grant support from funders whose contributions advance our work building shared standards, infrastructure, and meta-evaluation research for the AI evaluation field.
-
-<div class="flex flex-wrap items-center justify-center gap-8 my-8">
-  <img src="{{ '/assets/img/blogs/funder_logos/FP_logo_green_RGB.png' | relative_url }}" alt="Founders Pledge logo" class="h-16 w-auto object-contain">
-  <img src="{{ '/assets/img/blogs/funder_logos/Survival-and-Flourishing-Fund-LogoColor.svg' | relative_url }}" alt="Survival and Flourishing Fund logo" class="h-16 w-auto object-contain">
-  <img src="{{ '/assets/img/blogs/funder_logos/BMFTR_-_Logo_(en).png' | relative_url }}" alt="BMFTR logo" class="h-16 w-auto object-contain">
-</div>
 
 Founders Pledge (Global Catastrophic Risks Fund) has awarded the coalition funding to support development of Eval Cards. We are grateful to Sammy Martin and the Founders Pledge GCR team for their support of this work.
 
