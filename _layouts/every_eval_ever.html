@@ -274,6 +274,13 @@
 
                 <!-- Right side -->
                 <div class="flex items-center gap-3 sm:gap-6">
+                    {% if page.paper_url %}
+                    <a href="{{ page.paper_url }}" target="_blank" rel="noopener" class="flex items-center gap-2 text-sm font-medium hover:text-gray-600 transition-colors">
+                        <i class="fas fa-file-lines"></i>
+                        <span class="hidden sm:inline">Paper</span>
+                    </a>
+                    {% endif %}
+
                     <a href="https://huggingface.co/datasets/evaleval/EEE_datastore" target="_blank" class="flex items-center gap-2 text-sm font-medium hover:text-gray-600 transition-colors group">
                         <img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo-pirate.svg" alt="Hugging Face Logo" class="w-6 h-6 opacity-80 group-hover:opacity-100">
                         <span class="hidden sm:inline">Dataset</span>
@@ -322,6 +329,15 @@
                     <i data-lucide="external-link" class="w-4 h-4"></i>
                 </a>
             </div>
+
+            {% if page.paper_url %}
+            <div class="mt-6">
+                <a href="{{ page.paper_url }}" target="_blank" rel="noopener" class="text-sm font-medium inline-flex items-center gap-1.5" style="color: var(--accent);">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                    Read the full paper{% if page.paper_arxiv %} (arXiv:{{ page.paper_arxiv }}){% endif %}
+                </a>
+            </div>
+            {% endif %}
         </div>
     </section>
 
@@ -1039,6 +1055,8 @@
             </div>
         </div>
     </section>
+
+    {% include cite.html %}
 
     <!-- Footer -->
     <footer class="py-12 px-8 border-t border-gray-200 bg-white">

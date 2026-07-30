@@ -50,6 +50,9 @@ layout: default
     </div>
   {% endif %}
 
+  <!-- Citation (renders only when the project's front matter defines `bibtex`) -->
+  {% include cite.html %}
+
   <!-- Back Button -->
   {% if page.collection %}
     <a href="{{ '/' | append: page.collection | relative_url }}"
