@@ -5,6 +5,10 @@ _site
 .jekyll-cache
 .jekyll-metadata
 
-Gemfile.lock
+# Gemfile.lock is intentionally committed: the site is built by
+# .github/workflows/pages.yml rather than by GitHub's legacy Pages builder, so
+# the lockfile is what keeps production builds reproducible and stops an
+# unrelated gem release from breaking a deploy. Jekyll won't publish it —
+# _config.yml already lists it under `exclude`.
 .bundle/
 vendor/

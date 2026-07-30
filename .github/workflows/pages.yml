@@ -1,0 +1,65 @@
+name: Build and deploy site
+
+# Replaces the built-in "legacy" GitHub Pages build (Pages source: branch), which
+# builds server-side with the github-pages gem and is pinned to Jekyll 3.x —
+# ignoring this repo's Gemfile (jekyll ~> 4.3). Building here means local and
+# production use the same toolchain, and the build log is ours to read.
+#
+# Requires the repo's Pages source to be set to "GitHub Actions"
+# (Settings → Pages → Build and deployment → Source). Until that switch is made,
+# the `build` job still runs and validates, and `deploy` is the only part that
+# needs the new setting.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+# Queue deployments rather than collapsing them. `cancel-in-progress: false`
+# matters here: the legacy builder silently folded one commit's deploy into an
+# in-flight build for an earlier commit, reported success, and left the site a
+# commit behind for four weeks. Queuing makes each commit get its own publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Build with Jekyll
+        env:
+          # Legacy Pages built with JEKYLL_ENV=production; keep that identical so
+          # the switch doesn't quietly change rendered output.
+          JEKYLL_ENV: production
+        run: bundle exec jekyll build --trace
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        # Defaults to ./_site
+
+  deploy:
+    needs: build
+    # Only master publishes. Pull requests build and link-check but never deploy.
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -72,5 +72,10 @@ jobs:
           for f in ${{ steps.convert.outputs.converted_files }}; do
             git add "$f"
           done
-          git commit -m "chore: add PNG thumbnails converted from SVG post images [skip ci]"
+          # No [skip ci] here: this push has to reach the Pages deploy workflow,
+          # or a bot-generated thumbnail would sit undeployed until the next
+          # human push. Re-triggering this workflow is harmless and terminates
+          # immediately — the rerun finds the PNG already exists, converts 0,
+          # and the `if: converted != '0'` guard below skips the commit.
+          git commit -m "chore: add PNG thumbnails converted from SVG post images"
           git push
