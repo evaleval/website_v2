@@ -1,0 +1,169 @@
+{%- comment -%}
+  Citation block for project pages that have an accompanying paper.
+
+  Renders nothing unless the page defines `bibtex` in its front matter, so it is
+  safe to drop into any project layout. Expected front matter (see
+  _projects/every_eval_ever.md for a worked example):
+
+    paper_url, paper_arxiv, paper_title, paper_authors, paper_year, bibtex
+
+  `paper_authors` is rendered verbatim, so it should include its own terminal
+  punctuation (e.g. "Jan Batzner, Sree Harsha Nelaturu, Damian Stachura, et al.").
+
+  Styled with the design tokens (--bg, --bg-subtle, --fg, --fg-muted, --fg-subtle,
+  --border, --accent) that the eval_cards and every_eval_ever layouts define, so it
+  picks up light and dark mode on those pages without per-layout tailoring. Those
+  tokens are not defined site-wide, so every reference carries the light-mode value
+  as a fallback — that keeps the block styled correctly on the generic project
+  layout too.
+{%- endcomment -%}
+{% if page.bibtex %}
+<!-- ===================== CITATION ===================== -->
+<section id="cite" class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8"
+         style="background: var(--bg-subtle, #f5f4f1); border-top: 1px solid var(--border, #e8e6e1);">
+  <div class="max-w-3xl mx-auto">
+
+    <div class="cite-kicker">Citation</div>
+    <h2 class="font-bold mt-3 mb-4"
+        style="font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -.01em; color: var(--fg, #1a1916);">
+      Cite this work
+    </h2>
+
+    <p class="text-sm sm:text-base leading-relaxed mb-5" style="color: var(--fg-muted, #5c5a55);">
+      If {{ page.title }} informs your research, please cite the paper:
+    </p>
+
+    {%- comment -%}
+      `paper_authors` carries its own terminal punctuation (author lists usually end
+      in "et al."), so don't append a period here or it doubles up.
+    {%- endcomment -%}
+    <p class="text-sm sm:text-base leading-relaxed mb-6" style="color: var(--fg-muted, #5c5a55);">
+      {% if page.paper_authors %}{{ page.paper_authors }}{% endif %}
+      {% if page.paper_year %}{{ page.paper_year }}.{% endif %}
+      <em style="color: var(--fg, #1a1916);">{{ page.paper_title | default: page.title }}</em>.
+      {% if page.paper_arxiv %}arXiv:{{ page.paper_arxiv }}.{% endif %}
+      {% if page.paper_url %}
+        <a href="{{ page.paper_url }}" target="_blank" rel="noopener"
+           class="cite-link">Read it here<span aria-hidden="true"> &rarr;</span></a>
+      {% endif %}
+    </p>
+
+    <div class="cite-block">
+      <button type="button" class="cite-copy" data-cite-copy aria-label="Copy BibTeX to clipboard">
+        <i data-lucide="clipboard" class="w-3.5 h-3.5"></i>
+        <span data-cite-copy-label>Copy</span>
+      </button>
+      <pre data-cite-bibtex>{{ page.bibtex | strip | escape }}</pre>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  #cite .cite-kicker {
+    font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--fg-subtle, #9c9a95);
+  }
+  #cite .cite-link {
+    color: var(--accent, #5bacd1);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    white-space: nowrap;
+  }
+  #cite .cite-block { position: relative; }
+  #cite pre {
+    margin: 0;
+    padding: 1.25rem 1.25rem 1.25rem;
+    background: var(--bg, #ffffff);
+    border: 1px solid var(--border, #e8e6e1);
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--fg-muted, #5c5a55);
+    /* BibTeX is pre-wrapped by arXiv; keep long author lists scrollable, not reflowed. */
+    white-space: pre;
+    tab-size: 2;
+  }
+  #cite .cite-copy {
+    position: absolute;
+    top: .625rem;
+    right: .625rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .375rem;
+    padding: .3rem .6rem;
+    background: var(--bg-subtle, #f5f4f1);
+    border: 1px solid var(--border, #e8e6e1);
+    border-radius: 5px;
+    font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 11px;
+    color: var(--fg-muted, #5c5a55);
+    cursor: pointer;
+    transition: color .2s, border-color .2s;
+  }
+  #cite .cite-copy:hover { color: var(--fg, #1a1916); border-color: var(--border-strong, #c8c6c0); }
+  #cite .cite-copy[data-copied] { color: var(--accent, #5bacd1); border-color: var(--accent, #5bacd1); }
+  @media (max-width: 640px) {
+    /* Don't let the button sit on top of the first line of the entry. */
+    #cite pre { padding-top: 2.75rem; }
+  }
+</style>
+
+<script>
+  (function () {
+    var btn = document.querySelector('#cite [data-cite-copy]');
+    var pre = document.querySelector('#cite [data-cite-bibtex]');
+    if (!btn || !pre) return;
+
+    var label = btn.querySelector('[data-cite-copy-label]');
+    var reset;
+
+    function flash(text) {
+      if (label) label.textContent = text;
+      btn.setAttribute('data-copied', '');
+      clearTimeout(reset);
+      reset = setTimeout(function () {
+        if (label) label.textContent = 'Copy';
+        btn.removeAttribute('data-copied');
+      }, 2000);
+    }
+
+    btn.addEventListener('click', function () {
+      // textContent decodes the Liquid-escaped entities, so the clipboard gets
+      // BibTeX that compiles as-is.
+      var bibtex = pre.textContent;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(bibtex).then(function () {
+          flash('Copied');
+        }).catch(function () {
+          flash('Press ⌘C');
+        });
+        return;
+      }
+
+      // Fallback for non-secure contexts (e.g. plain-http local previews).
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = bibtex;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        flash(ok ? 'Copied' : 'Press ⌘C');
+      } catch (e) {
+        flash('Press ⌘C');
+      }
+    });
+  })();
+</script>
+{% endif %}
