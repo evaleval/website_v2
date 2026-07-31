@@ -56,12 +56,16 @@ jobs:
             echo "🔄 Converting $svg → $png"
             # 1200×630 is the recommended og:image size for all major platforms
             rsvg-convert --width 1200 --height 630 --keep-aspect-ratio "$svg" -o "$png"
-            converted_files="$converted_files $png"
+            converted_files+="$png"$'\n'
             converted=$((converted + 1))
           done < <(grep -h "^image:" _posts/*.md 2>/dev/null || true)
 
-          echo "converted=$converted" >> "$GITHUB_OUTPUT"
-          echo "converted_files=$converted_files" >> "$GITHUB_OUTPUT"
+          {
+            echo "converted=$converted"
+            echo "converted_files<<EOF"
+            printf '%s' "$converted_files"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Commit converted PNGs
         if: steps.convert.outputs.converted != '0'
@@ -69,13 +73,14 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Stage only the files we actually converted (they may live anywhere)
-          for f in ${{ steps.convert.outputs.converted_files }}; do
+          while IFS= read -r f; do
+            [[ -n "$f" ]] || continue
             git add "$f"
-          done
+          done <<< "${{ steps.convert.outputs.converted_files }}"
           # No [skip ci] here: this push has to reach the Pages deploy workflow,
           # or a bot-generated thumbnail would sit undeployed until the next
           # human push. Re-triggering this workflow is harmless and terminates
           # immediately — the rerun finds the PNG already exists, converts 0,
-          # and the `if: converted != '0'` guard below skips the commit.
+          # and the `if: converted != '0'` guard above skips the commit.
           git commit -m "chore: add PNG thumbnails converted from SVG post images"
           git push

@@ -21,7 +21,7 @@ on:
 # in-flight build for an earlier commit, reported success, and left the site a
 # commit behind for four weeks. Queuing makes each commit get its own publish.
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -50,7 +50,7 @@ jobs:
 
   deploy:
     needs: build
-    # Only master publishes. Pull requests build and link-check but never deploy.
+    # Only master publishes. Pull requests build but never deploy.
     if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
